@@ -27,13 +27,13 @@ A self-built Security Operations Center lab covering SIEM deployment, endpoint d
 
 I chose host-only + NAT over bridged networking so the brute-force simulation stayed isolated, IPs stayed stable, and a firewall/IDS layer could be added later.
 
-![Wazuh agent active](screenshots/03-windows-agent-active.png)
+![Wazuh agent active](screenshots/screenshots/03-windows-agent-active.png)
 
 ## File Integrity Monitoring
 
 Configured real-time FIM on test folders on both endpoints. Creating a file triggered level 5 alerts, and modifying or deleting it triggered level 7 alerts, consistently across Windows and Linux.
 
-![FIM alerts](screenshots/05-windows-fim-alerts.png)
+![FIM alerts](screenshots/screenshots/05-windows-fim-alerts.png)
 
 ## Microsoft Defender Integration
 
@@ -43,8 +43,8 @@ Forwarded Defender's Operational event log to Wazuh and validated it with the EI
 
 Wazuh's dashboard only shows alerts at level 3 or higher, so routine Sysmon events were ingested but invisible. I wrote a custom rule in `local_rules.xml` that raises Sysmon Event ID 1 (process creation) to level 8.
 
-![Custom rule](screenshots/11-custom-rule-100100.png)
-![Custom rule firing](screenshots/12-custom-rule-alerts.png)
+![Custom rule](screenshots/screenshots/11-custom-rule-100100.png)
+![Custom rule firing](screenshots/screenshots/12-custom-rule-alerts.png)
 
 ## SSH Brute-Force Attack Simulation
 
@@ -57,7 +57,7 @@ From the Kali VM, I ran a dictionary-based SSH brute-force attack with Hydra aga
 | 5715 | 3 | Successful authentication |
 | 5501 | 3 | Session opened |
 
-![Brute-force correlation alert](screenshots/16-brute-force-correlation-alert.png)
+![Brute-force correlation alert](screenshots/screenshots/16-brute-force-correlation-alert.png)
 
 ## Troubleshooting: Silent Pipeline Failure
 
@@ -78,4 +78,4 @@ Wazuh • VirtualBox • Sysmon (SwiftOnSecurity config) • Microsoft Defender 
 
 ## Screenshots
 
-All 16 figures from the report are in the [screenshots](screenshots/) folder.
+All 16 figures from the report are in the [screenshots](screenshots/screenshots/) folder.
