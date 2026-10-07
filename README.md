@@ -59,6 +59,29 @@ From the Kali VM, I ran a dictionary-based SSH brute-force attack with Hydra aga
 
 ![Brute-force correlation alert](screenshots/screenshots/16-brute-force-correlation-alert.png)
 
+## Automated Response: Blocking the Attacker
+
+After detecting the brute force, I configured Wazuh **Active Response** to contain it automatically, moving the lab from detection-only to detection *and* response. When a brute-force alert fires, Wazuh runs the `firewall-drop` command on the victim, which inserts an `iptables` DROP rule against the attacker's IP. A 180-second timeout removes the rule automatically, so a one-off attack doesn't permanently lock out an address.
+
+![Active Response configuration](screenshots/screenshots/17-active-response-config.png)
+
+**Tuning the response to the right rule:** my first tests detected the attack but never triggered a block. By inspecting `/var/ossec/logs/alerts/alerts.log`, I found the attack was firing **rule 5712** ("brute force, non-existent user"), not rule 5763, which my Active Response was originally pointing at. Because I attacked with a username that didn't exist on the victim, Wazuh classified it differently than I expected. Updating the response to trigger on the correct rule ID fixed it, a small but real example of making detection and response actually match.
+
+The block works at the network layer: the victim drops the attacker's traffic, and Hydra can no longer connect, timing out instead of completing.
+
+![Attacker blocked: iptables DROP rule and Hydra timeout](screenshots/screenshots/18-block-iptables-hydra.png)
+
+The dashboard shows the full chain in one view, three brute-force detections (rule 5712) followed by the firewall-drop response (rule 651), with the block landing about one second after detection.
+
+![Dashboard: detection and automated response](screenshots/screenshots/19-dashboard-detection-response.png)
+
+| Rule | Level | Meaning |
+| ---- | ----- | ------- |
+| 5712 | 10 | Brute force trying to access the system (non-existent user) |
+| 651 | 3 | Host blocked by firewall-drop Active Response |
+
+**MITRE ATT&CK:** Credential Access — Brute Force: Password Guessing (T1110.001)
+
 ## Troubleshooting: Silent Pipeline Failure
 
 Alerts stopped appearing partway through testing. I traced it to the Wazuh server's 25 GB disk hitting 100%, then:
